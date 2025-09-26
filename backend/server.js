@@ -1,20 +1,20 @@
 const mysql = require('mysql2');
-
 const express = require('express');
 const cors =  require('cors');
 
 const app = express();
-app.use(express.json());
-app.use(cors());
 
 const porta = 3000;
 
+app.use(cors());
+
 const connection = mysql.createConnection({
-    host: 'localhost',       // Servidor do MySQL
-    user: 'root',     // Usuário do MySQL
-    password: '',   // Senha do MySQL
-    database: 'planilha' // AQUI você coloca o nome do banco
-  });
+  host: 'localhost',       // Servidor do MySQL
+  user: 'root',     // Usuário do MySQL
+  password: '',   // Senha do MySQL
+  database: 'planilha' // AQUI você coloca o nome do banco
+});
+
 
 connection.connect((erro) => {
     if (erro) {
@@ -30,9 +30,11 @@ app.get('/tabela', (req, res) => {
             console.log("Erro ", erro )
             return
         } 
-        res.json(resultado)
+        res.send(resultado)
     })
 })
+
+
 
 
 app.listen(porta, ()  => {
