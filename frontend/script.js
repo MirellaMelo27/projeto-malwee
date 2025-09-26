@@ -26,6 +26,8 @@ fetch('http://localhost:3000/tabela')
           <td>${item["Sobra de Rolo?"]}</td>
         </tr>
       `;
+
+      console.log
     });
   })
   .catch(err => console.error(err));
