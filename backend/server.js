@@ -15,7 +15,7 @@ connection.connect((erro) => {
     console.log('Conectado ao MySQL!');
   });
 
-app.get('tabela', (req, res) => {
+app.get('/tabela', (req, res) => {
     connection.query('select * from data', (erro, resultado) => {
         if (erro) {
             console.log("Erro ", erro )
