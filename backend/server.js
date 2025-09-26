@@ -33,3 +33,6 @@ const connection = mysql.createConnection({
   database: 'planilha' // AQUI você coloca o nome do banco
 });
 
+app.listen(porta, ()  => {
+    console.log("http://localhost:3000")
+})
