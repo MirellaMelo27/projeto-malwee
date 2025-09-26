@@ -10,22 +10,18 @@ fetch('http://localhost:3000/tabela')
 .then(tabelas => {
 
     console.log(tabelas)
-    const info = document.getElementById('info');
+    const info = document.getElementById('infos');
 
-    tabelas.forEach(item => {
+    tabelas.slice(0,500).forEach(item => {
       info.innerHTML += `
         <tr>
           <td>${item["Data (AAAA-MM-DD HH:MM:SS)"]}</td>
-          <td>${item["Maquina"]}</td>
           <td>${item["Tipo Tecido"]}</td>
           <td>${item["Tipo de Saida"]}</td>
           <td>${item["Numero da tarefa"]}</td>
-          <td>${item["Tempo de setup"]}</td>
-          <td>${item["Tempo de ProduÃ§Ã£o"]}</td>
           <td>${item["Quantidade de Tiras"]}</td>
           <td>${item["Metros Produzidos"]}</td>
           <td>${item["Tarefa completa?"]}</td>
-          <td>${item["Sobra de Rolo?"]}</td>
         </tr>
       `;
 
