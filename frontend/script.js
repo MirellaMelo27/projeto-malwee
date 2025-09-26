@@ -8,7 +8,9 @@ fetch('http://localhost:3000/tabela')
 })
 
 .then(tabelas => {
-    const info = document.getElementById('infos');
+
+    console.log(tabelas)
+    const info = document.getElementById('info');
 
     tabelas.forEach(item => {
       info.innerHTML += `
