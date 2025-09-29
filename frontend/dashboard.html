@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard GrupoMalwee</title>
+  <link rel="stylesheet" href="dashboard.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- Cabeçalho -->
+  <header>
+    <nav>
+      <a href="index.html">INFORMAÇÕES</a>
+      <a href="dashboard.html">DASHBOARD</a>
+    </nav>
+    <div class="logo">
+      <img src="image.png" alt="Logo Grupo Malwee" id="logo">
+    </div>
+  </header>
+
+  <!-- Layout principal -->
+  <div class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <button id="maquina1">MÁQUINA 1</button>
+      <button id="simulacao">INICIAR SIMULAÇÃO</button>
+    </aside>
+
+    <!-- Conteúdo -->
+    <main class="content">
+      <div class="card">
+        <h4>METROS PRODUZIDOS POR SAÍDA</h4>
+        <canvas id="metrosChart"></canvas>
+      </div>
+      <div class="card">
+        <h4>MARGEM DE SUCESSO</h4>
+        <canvas id="sucessoChart"></canvas>
+      </div>
+    </main>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>
