@@ -34,9 +34,6 @@ app.get('/tabela', (req, res) => {
     })
 })
 
-
-
-
 app.listen(porta, ()  => {
     console.log("http://localhost:3000")
 })
