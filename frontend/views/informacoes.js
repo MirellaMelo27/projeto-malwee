@@ -9,7 +9,7 @@ fetch('http://localhost:3000/tabela')
     console.log(tabelas);
     const info = document.getElementById('infos'); 
 
-    tabelas.slice(0, 500).forEach(item => {
+    tabelas.slice(0, 50).forEach(item => {
       info.innerHTML += `
         <tr>
           <td>${item["Data (AAAA-MM-DD HH:MM:SS)"]}</td>
