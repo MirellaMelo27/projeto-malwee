@@ -1,12 +1,13 @@
-fetch('http://localhost:3000/tabela')
+async function loadView(view) {
+  const res = await fetch(`views/${view}.html`);
+  const html = await res.text();
+  document.getElementById("content").innerHTML = html;
+}
 
-.then(response => {
-    if(!response.ok){
-        throw new Error('Erro ao buscar os produtos')
-    }
-    return response.json()
-})
+document.getElementById("btn-dashboard").addEventListener("click", () => loadView("dashboard"));
+document.getElementById("btn-infos").addEventListener("click", () => loadView("informacoes"));
 
+<<<<<<< HEAD
 .then(tabelas => {
 
     console.log(tabelas)
@@ -29,3 +30,6 @@ fetch('http://localhost:3000/tabela')
     });
   })
   .catch(err => console.error(err));
+=======
+loadView("dashboard");
+>>>>>>> b3380a07341cefa4e72d0da06e34e9a0302c6ab5
