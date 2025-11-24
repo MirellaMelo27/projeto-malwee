@@ -11,10 +11,10 @@ app.use(express.static('frontend'));
 
 const bagulhoDoBanco = mysql.createPool({
     host: 'localhost',
-    port: 3306,
+    port: 3307,
     user: 'root',
     password: 'root',
-    database: 'planilha',
+    database: 'projeto_malwee',
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
@@ -94,7 +94,7 @@ app.get('/api/reinicios', async (req, res) => {
 
         let query = `
             SELECT id, data_registro AS data, Maquina, obs
-            FROM tarefas_producao
+            FROM historicoatividades
             WHERE status = 'Reinicio'
         `;
 
