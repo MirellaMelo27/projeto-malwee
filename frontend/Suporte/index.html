@@ -121,6 +121,34 @@
 
         <hr>
         <h1>Forúm</h1>
+        <div class="container mt-4" id="forum">
+            <div class="card bg-black text-white border-secondary mb-4 shadow-sm">
+                <div class="card-body">
+                    <h4 class="mb-3"><i class="bi bi-chat-dots me-2"></i>Deixe seu comentário</h4>
+        
+                    <div class="mb-3">
+                        <label class="form-label">Comentário</label>
+                        <textarea class="form-control bg-dark text-white border-secondary" id="forum-texto" rows="3" placeholder="Digite seu comentário"></textarea>
+                    </div>
+        
+                    <button class="btn btn-outline-info" onclick="enviarComentario()">Enviar</button>
+                </div>
+            </div>
+        
+            <!-- Lista de Comentários -->
+            <div class="card bg-black text-white border-secondary shadow-sm">
+                <div class="card-body">
+                    <h4 class="mb-3"><i class="bi bi-people me-2"></i>Comentários</h4>
+        
+                    <ul id="lista-comentarios" class="list-group list-group-flush">
+                        <!-- Comentários aparecem aqui -->
+                    </ul>
+                </div>
+            </div>
+        
+        </div>
+        
+
     </main>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
