@@ -1,0 +1,100 @@
+body {
+    background-color: #0b0f0e;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+    font-family: "Inter", sans-serif;
+  }
+
+  .logo {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .logo img {
+    width: 300px;
+    height: 80px;
+  }
+
+  .logo h1 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-top: 10px;
+  }
+
+  .logo small {
+    color: #aaa;
+    font-size: 0.9rem;
+  }
+
+  .card {
+    background-color: #121615;
+    border: none;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px;
+    height: 300px;
+    width: 340px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    transition: all 0.3s ease-in-out;
+    justify-content: center;
+  }
+
+
+  .form-control {
+    background-color: #2b2f2d;
+    border: none;
+    color: white;
+  }
+
+  .form-control:focus {
+    background-color: #2b2f2d;
+    color: white;
+    box-shadow: none;
+    outline: 1px solid #00c389;
+  }
+
+  .btn-custom {
+    background-color: #2b7052;
+    color: white;
+    width: 100%;
+  }
+
+  .btn-custom:hover {
+    background-color: #239c73;
+    color: white;
+  }
+
+  .form-control::placeholder {
+    color: white;
+  }
+
+  .form-check-label {
+    color:white;
+  }
+
+  .form-check-label:hover {
+    text-decoration: underline;
+  }
+
+
+  .toggle-link {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    font-size: 0.9rem;
+    color: #bbb;
+    cursor: pointer;
+  }
+
+  .toggle-link:hover {
+    text-decoration: underline;
+    color: #00c389;
+  }
+
+  .form-check-label {
+    font-size: 0.85rem;
+  }

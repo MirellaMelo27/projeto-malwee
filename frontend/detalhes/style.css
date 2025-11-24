@@ -1,0 +1,288 @@
+:root {
+    --bs-dark: #212529;
+    --bs-black: #000000;
+    --bs-dark-card: #1c1f23;
+    --bs-primary: #0d6efd;
+    --bs-info: #0dcaf0;
+    --bs-success: #198754;
+    --bs-danger: #dc3545;
+}
+
+body {
+    background-color: var(--bs-body-bg);
+}
+
+.container-fluid.p-4 {
+    margin: 0;
+    background-color: #111010;
+}
+
+.navbar {
+    background-color: #100D0D !important;
+    height: 100px;
+    border-bottom-color: #555555af !important;
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+}
+
+.navbar-nav .nav-link {
+    color: #f8f9fa !important;
+    border-bottom: 2px solid transparent;
+    transition: border-bottom 0.3s;
+    font-size: 20px;
+    margin-top: 30px;
+    margin-right: 30px;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+    color: var(--bs-primary) !important;
+    border-bottom: 2px solid var(--bs-primary);
+}
+
+img {
+    height: 65px;
+    margin-left: 20px;
+}
+
+
+section#detalhes {
+    margin: 35px;
+    margin-top: 0px;
+}
+
+.card-tabela {
+    background-color: var(--bs-dark-card) !important;
+    color: #f8f9fa;
+    border: 1px solid rgba(255, 255, 255, 0.11) !important;
+    border-radius: 0.5rem;
+    width: 100%;
+    height: auto;
+}
+
+.input-group > .form-control {
+    border-color: #555555af !important;
+}
+.form-control.bg-dark {
+    background-color: var(--bs-dark-card) !important;
+    color: white !important;
+}
+
+.btn-outline-secondary {
+    border-color: #555555af;
+}
+
+.task-table {
+    --bs-table-bg: var(--bs-dark-card);
+    --bs-table-hover-bg: #2a2e33;
+    --bs-table-striped-bg: #222529;
+    color: var(--bs-light);
+}
+
+.task-table thead tr {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.task-table tbody tr {
+     cursor: pointer;
+}
+
+.pagination .page-link {
+    background-color: var(--bs-dark-card);
+    border-color: #555555af;
+    color: var(--bs-secondary);
+}
+.pagination .page-item.active .page-link {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: white;
+}
+.pagination .page-item.disabled .page-link {
+    background-color: var(--bs-dark-card);
+    border-color: #555555af;
+    color: #495057;
+}
+.pagination input.form-control {
+     background-color: var(--bs-dark-card) !important;
+     border-color: #555555af !important;
+     color: var(--bs-light) !important;
+}
+/*temasss*/
+
+[data-bs-theme="light"] {
+    --bs-dark-card: #ffffff;
+}
+
+[data-bs-theme="light"] body {
+    background-color: #f8f9fa;
+    color: #212529;
+}
+
+[data-bs-theme="light"] .container-fluid.p-4 {
+    background-color: #f0f2f5;
+}
+
+[data-bs-theme="light"] .navbar {
+    background-color: #ffffff !important;
+    border-bottom-color: #dee2e6 !important;
+}
+
+[data-bs-theme="light"] .navbar-nav .nav-link {
+    color: #212529 !important;
+}
+
+[data-bs-theme="light"] .navbar-nav .nav-link:hover,
+[data-bs-theme="light"] .navbar-nav .nav-link.active {
+    color: var(--bs-primary) !important;
+}
+
+[data-bs-theme="light"] .card-tabela {
+    background-color: var(--bs-dark-card) !important;
+    border: 1px solid #dee2e6 !important;
+    color: #212529;
+}
+
+/* tabela (tema claro) */
+[data-bs-theme="light"] .task-table {
+    --bs-table-bg: var(--bs-dark-card);
+    --bs-table-hover-bg: #f1f1f1;
+    --bs-table-striped-bg: #f8f9fa;
+    color: #212529;
+}
+[data-bs-theme="light"] .table-dark th {
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+    color: #495057;
+}
+[data-bs-theme="light"] .task-table thead tr {
+    border-bottom: 1px solid #dee2e6;
+}
+
+[data-bs-theme="light"] .input-group > .form-control {
+    border-color: #dee2e6 !important;
+    background-color: #fff !important;
+    color: #212529 !important;
+}
+
+[data-bs-theme="light"] .pagination .page-link {
+    background-color: #fff;
+    border-color: #dee2e6;
+    color: var(--bs-primary);
+}
+[data-bs-theme="light"] .pagination .page-item.active .page-link {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: white;
+}
+[data-bs-theme="light"] .pagination .page-item.disabled .page-link {
+    background-color: #fff;
+    border-color: #dee2e6;
+    color: #adb5bd;
+}
+[data-bs-theme="light"] .pagination input.form-control {
+     background-color: #fff !important;
+     border-color: #dee2e6 !important;
+     color: #212529 !important;
+}
+
+
+[data-bs-theme="light"] .text-white {
+    color: #212529 !important;
+}
+[data-bs-theme="light"] .text-secondary {
+    color: #6c757d !important;
+}
+
+[data-bs-theme="light"] .text-primary { color: var(--bs-primary) !important; }
+[data-bs-theme="light"] .text-warning { color: var(--bs-warning) !important; }
+[data-bs-theme="light"] .text-success { color: var(--bs-success) !important; }
+[data-bs-theme="light"] .text-danger { color: var(--bs-danger) !important; }
+
+/*sidebar, layout*/
+
+#sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    height: 100vh;
+    background-color: #0d0d0d;
+    display: flex;
+    flex-direction: column;
+    z-index: 1050;
+    padding-bottom: 1rem;
+    border-right: 1px solid #2b2b2b;
+}
+
+#sidebar .nav-link {
+    color: #f8f9fa;
+    padding: 12px 20px;
+    font-size: 18px;
+}
+
+#sidebar .nav-link:hover,
+#sidebar .nav-link.active {
+    background-color: rgba(13, 110, 253, 0.2);
+    color: var(--bs-primary);
+}
+
+#logo-img {
+    height: 60px;
+    margin: 20px;
+    left: 20px;
+}
+
+#main-content {
+    margin-left: 260px;
+    width: auto; /* Correção da barra de rolagem */
+    /* remove a transição daqui para ser controlada pelo global */
+}
+
+html[data-bs-theme="light"] #sidebar {
+    background-color: #ffffff !important;
+    border-right: 1px solid #dee2e6 !important;
+}
+
+html[data-bs-theme="light"] #sidebar .nav-link {
+    color: #212529 !important;
+}
+
+html[data-bs-theme="light"] #sidebar .nav-link.active,
+html[data-bs-theme="light"] #sidebar .nav-link:hover {
+    background-color: rgba(13, 110, 253, 0.1) !important;
+    color: var(--bs-primary) !important;
+}
+
+html[data-bs-theme="light"] #sidebar .text-secondary {
+    color: #6c757d !important;
+}
+
+@media (max-width: 768px) {
+    #sidebar {
+        width: 200px;
+    }
+
+    #main-content {
+        margin-left: 200px;
+    }
+}
+
+/*transição suave, bacana*/
+
+body,
+#main-content,
+#sidebar,
+#sidebar .nav-link,
+.card-tabela,
+.modal-content,
+.form-control,
+.pagination .page-link,
+.text-white,
+.text-secondary {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.card, .card2, .card3 {
+     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
