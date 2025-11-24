@@ -10,8 +10,8 @@ app.use(express.json());
 app.use(express.static('frontend'));
 
 const bagulhoDoBanco = mysql.createPool({
-    host: '127.0.0.1',
-    port: 3307,
+    host: 'localhost',
+    port: 3306,
     user: 'root',
     password: 'root',
     database: 'planilha',
@@ -19,7 +19,7 @@ const bagulhoDoBanco = mysql.createPool({
     connectionLimit: 10,
     queueLimit: 0
 });
-
+ 
 bagulhoDoBanco.getConnection()
     .then(conexao => {
         console.log('sql tá funcionando, tudo nos conformes');
@@ -30,25 +30,105 @@ bagulhoDoBanco.getConnection()
         process.exit(1);
     });
 
+app.post('/api/login', async (req, res) => {
+    try {
+        const { email, senha } = req.body;
+
+        if (!email || !senha) {
+            return res.status(400).json({ erro: 'Email e senha são obrigatórios.' });
+        }
+
+        const [linhas] = await bagulhoDoBanco.query(
+            'SELECT nome, email FROM dadoslogin WHERE email = ? AND senha = ?',
+            [email, senha]
+        );
+
+        if (linhas.length === 0) {
+            return res.status(401).json({ sucesso: false, erro: 'Credenciais inválidas.' });
+        }
+
+        res.json({
+            sucesso: true,
+            usuario: linhas[0]
+        });
+
+    } catch (erro) {
+        console.error('Erro no login:', erro);
+        res.status(500).json({ erro: 'Erro interno no servidor.' });
+    }
+});
+
+app.post('/api/registro', async (req, res) => {
+    try {
+        const { nome, email, senha } = req.body;
+
+        if (!nome || !email || !senha) {
+            return res.status(400).json({ erro: 'Todos os campos são obrigatórios.' });
+        }
+
+        const [existe] = await bagulhoDoBanco.query(
+            'SELECT * FROM dadoslogin WHERE email = ?',
+            [email]
+        );
+
+        if (existe.length > 0) {
+            return res.status(400).json({ erro: 'E-mail já cadastrado.' });
+        }
+
+        await bagulhoDoBanco.query(
+            'INSERT INTO dadoslogin (nome, email, senha) VALUES (?, ?, ?)',
+            [nome, email, senha]
+        );
+
+        res.status(201).json({ mensagem: 'Usuário registrado com sucesso!' });
+
+    } catch (erro) {
+        console.error('Erro no cadastro:', erro);
+        res.status(500).json({ erro: 'Erro interno no servidor.' });
+    }
+});
+
+app.get('/api/reinicios', async (req, res) => {
+    try {
+        const { mes, ano } = req.query;
+
+        let query = `
+            SELECT id, data_registro AS data, Maquina, obs
+            FROM tarefas_producao
+            WHERE status = 'Reinicio'
+        `;
+
+        const params = [];
+
+        if (mes && ano) {
+            query += ` AND MONTH(data_registro) = ? AND YEAR(data_registro) = ?`;
+            params.push(mes, ano);
+        }
+
+        query += ` ORDER BY data_registro DESC`;
+
+        const [linhas] = await bagulhoDoBanco.query(query, params);
+
+        res.json(linhas);
+
+    } catch (err) {
+        console.error("Erro ao buscar reinícios:", err);
+        res.status(500).json({ erro: 'Erro interno ao buscar reinicializações.' });
+    }
+});
+
 app.get('/api/tarefas', async (req, res) => {
     try {
-        const { id, dataBusca } = req.query;
+        const { busca, dataBusca } = req.query;
 
         let querySql = `
             SELECT
-                \`id\` AS id,
-                \`Data (AAAA-MM-DD HH:MM:SS)\` AS data,
-                \`Maquina\` AS maquina,
-                \`Tipo Tecido\` AS tipo_tecido,
-                \`Tipo de Saida\` AS tipo_saida,
-                \`Numero da tarefa\` AS numero_tarefa,
-                \`Tempo de setup\` AS tempo_setup,
-                \`Tempo de Produção\` AS tempo_producao,
-                \`Quantidade de Tiras\` AS qtd_tiras,
-                \`Metros Produzidos\` AS metros,
-                \`Tarefa completa?\` AS tarefa_completa,
-                \`Sobra de Rolo?\` AS tem_sobra,
-                \`obs\` AS observacao
+                \`id\` AS id, \`data_registro\` AS data, \`Maquina\` AS maquina,
+                \`Tipo Tecido\` AS tipo_tecido, \`Tipo de Saida\` AS tipo_saida,
+                \`Numero da tarefa\` AS numero_tarefa, \`Tempo de setup\` AS tempo_setup,
+                \`Tempo de Produção\` AS tempo_producao, \`Quantidade de Tiras\` AS qtd_tiras,
+                \`Metros Produzidos\` AS metros, \`tarefa_completa\` AS tarefa_completa,
+                \`sobra_rolo\` AS tem_sobra, \`obs\` AS observacao, \`status\` AS status
             FROM \`tarefas_producao\`
         `;
 
@@ -57,44 +137,32 @@ app.get('/api/tarefas', async (req, res) => {
 
         if (dataBusca) {
             if (/^\d{4}-\d{2}-\d{2}$/.test(dataBusca)) {
-                condicoes.push('DATE(`Data (AAAA-MM-DD HH:MM:SS)`) = ?');
+                condicoes.push('DATE(`data_registro`) = ?');
                 params.push(dataBusca);
             } else {
                 console.warn("Formato de data inválido recebido:", dataBusca);
             }
         }
 
-        if (id) {
-            const idNum = parseInt(id, 10);
-            if (!Number.isNaN(idNum)) {
-                condicoes.push('`id` = ?');
-                params.push(idNum);
+        if (busca) {
+            const idNum = parseInt(busca, 10);
+            if (!Number.isNaN(idNum) && String(idNum) === busca) {
+                condicoes.push('(`id` = ? OR `Numero da tarefa` = ?)');
+                params.push(idNum); 
+                params.push(busca); 
             } else {
-                console.warn('ID inválido recebido:', id);
+                condicoes.push('`Numero da tarefa` = ?');
+                params.push(busca);
             }
         }
 
         if (condicoes.length) querySql += ' WHERE ' + condicoes.join(' AND ');
+        querySql += ' ORDER BY `data_registro` DESC';
 
-        querySql += ' ORDER BY `Data (AAAA-MM-DD HH:MM:SS)` DESC';
-
-        console.log('Executando SQL (parametrizado):', querySql);
-        console.log('Params:', params);
         const [linhas] = await bagulhoDoBanco.query(querySql, params);
 
-        const mapTipoTecido = {
-            0: 'meia malha',
-            1: 'cotton',
-            2: 'punho pun',
-            3: 'punho new',
-            4: 'punho san',
-            5: 'punho elan'
-        };
-
-        const mapTipoSaida = {
-            0: 'rolinho',
-            1: 'fraldado'
-        };
+        const mapTipoTecido = { 0: 'meia malha', 1: 'cotton', 2: 'punho pun', 3: 'punho new', 4: 'punho san', 5: 'punho elan' };
+        const mapTipoSaida = { 0: 'rolinho', 1: 'fraldado' };
 
         const tarefas = linhas.map(tarefa => ({
             ...tarefa,
@@ -108,125 +176,195 @@ app.get('/api/tarefas', async (req, res) => {
         res.json(tarefas);
 
     } catch (erro) {
-        console.error('-----------------------------------------');
-        console.error('!!! ERRO DETALHADO ao buscar tarefas !!!');
-        console.error('Timestamp:', new Date().toISOString());
-        console.error('Query Params Recebidos:', req.query);
-        console.error('Erro Code:', erro && erro.code);
-        console.error('Erro SQL Message:', erro && erro.sqlMessage);
-        console.error('Erro Stack:', erro && erro.stack);
-        console.error('-----------------------------------------');
+        console.error('--- ERRO AO BUSCAR TAREFAS ---');
+        console.error(erro);
         res.status(500).json({ erro: 'Erro interno no servidor ao buscar tarefas.' });
     }
 });
 
-app.post('/api/register', async (req, res) => {
-    const { nome, email, senha } = req.body;
-    if (!nome || !email || !senha) return res.status(400).json({ erro: 'Preencha todos os campos' });
+app.post('/api/tarefas', async (req, res) => {
     try {
-        const [existe] = await bagulhoDoBanco.query('SELECT * FROM dadoslogin WHERE email = ?', [email]);
-        if (existe.length > 0) return res.status(400).json({ erro: 'Email já cadastrado' });
-        await bagulhoDoBanco.query('INSERT INTO dadoslogin (nome, email, senha) VALUES (?, ?, ?)', [nome, email, senha]);
-        res.json({ sucesso: true, mensagem: 'Conta criada com sucesso!' });
+        const { maquina, tipo_tecido, tipo_saida, numero_tarefa, tempo_setup, tempo_producao, qtd_tiras, metros, tarefa_completa, tem_sobra, obs, status } = req.body;
+        if (!numero_tarefa || !maquina || !status) {
+            return res.status(400).json({ erro: 'N° Tarefa, Máquina e Status são obrigatórios.' });
+        }
+        const [resultado] = await bagulhoDoBanco.query(
+            `INSERT INTO tarefas_producao (data_registro, Maquina, \`Tipo Tecido\`, \`Tipo de Saida\`, \`Numero da tarefa\`, \`Tempo de setup\`, \`Tempo de Produção\`, \`Quantidade de Tiras\`, \`Metros Produzidos\`, tarefa_completa, sobra_rolo, obs, status) VALUES (NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [ maquina, tipo_tecido, tipo_saida, numero_tarefa, tempo_setup || 0, tempo_producao || 0, qtd_tiras || 0, metros || 0, tarefa_completa || 'FALSE', tem_sobra || 'FALSE', obs || '', status ]
+        );
+        res.status(201).json({ id: resultado.insertId, mensagem: 'Tarefa criada com sucesso!' });
     } catch (erro) {
-        console.error('erro ao cadastrar usuário:', erro);
-        res.status(500).json({ erro: 'deu ruim no servidor ao criar conta' });
+        console.error('--- ERRO AO CRIAR TAREFA ---');
+        console.error(erro);
+        res.status(500).json({ erro: 'Erro interno no servidor ao criar tarefa.' });
     }
 });
 
-app.post('/api/login', async (req, res) => {
-    const { email, senha } = req.body;
-    if (!email || !senha) return res.status(400).json({ erro: 'Preencha email e senha' });
+app.put('/api/tarefas/:id', async (req, res) => {
     try {
-        const [resultado] = await bagulhoDoBanco.query('SELECT * FROM dadoslogin WHERE email = ?', [email]);
-        if (resultado.length === 0) return res.status(401).json({ erro: 'Usuário não encontrado' });
-        const usuario = resultado[0];
-        if (usuario.senha !== senha) return res.status(401).json({ erro: 'Senha incorreta' });
-        res.json({ sucesso: true, mensagem: 'Login bem-sucedido!', usuario: { nome: usuario.nome, email: usuario.email } });
+        const { id } = req.params;
+        const {
+            maquina, tipo_tecido, tipo_saida, numero_tarefa,
+            tempo_setup, tempo_producao, qtd_tiras, metros,
+            tarefa_completa, tem_sobra, obs, status
+        } = req.body;
+
+        if (!numero_tarefa || !maquina || !status) {
+            return res.status(400).json({ erro: 'N° Tarefa, Máquina e Status são obrigatórios.' });
+        }
+
+        const [resultado] = await bagulhoDoBanco.query(
+            `UPDATE tarefas_producao SET
+                Maquina = ?, \`Tipo Tecido\` = ?, \`Tipo de Saida\` = ?, \`Numero da tarefa\` = ?,
+                \`Tempo de setup\` = ?, \`Tempo de Produção\` = ?, \`Quantidade de Tiras\` = ?,
+                \`Metros Produzidos\` = ?, tarefa_completa = ?, sobra_rolo = ?, obs = ?, status = ?
+            WHERE id = ?`,
+            [
+                maquina, tipo_tecido, tipo_saida, numero_tarefa,
+                tempo_setup, tempo_producao, qtd_tiras, metros,
+                tarefa_completa, tem_sobra, obs, status,
+                id
+            ]
+        );
+
+        if (resultado.affectedRows === 0) {
+            return res.status(404).json({ erro: 'Tarefa não encontrada.' });
+        }
+
+        res.json({ mensagem: 'Tarefa atualizada com sucesso!' });
+
     } catch (erro) {
-        console.error('erro ao fazer login:', erro);
-        res.status(500).json({ erro: 'deu ruim no servidor ao fazer login' });
+        console.error('--- ERRO AO ATUALIZAR TAREFA ---');
+        console.error(erro);
+        res.status(500).json({ erro: 'Erro interno no servidor ao atualizar tarefa.' });
     }
 });
 
-app.get('/api/indicadores', async (req, res) => {
+app.delete('/api/tarefas/:id', async (req, res) => {
     try {
-        const [resultado] = await bagulhoDoBanco.query(`
-            SELECT 
-                COUNT(*) AS total_tarefas,
-                SUM(\`Metros Produzidos\`) AS total_metros,
-                SUM(CASE WHEN \`Tarefa completa?\` = 'TRUE' THEN 1 ELSE 0 END) AS tarefas_completas,
-                SUM(\`Quantidade de Tiras\`) AS total_tiras
-            FROM \`tarefas_producao\`;
-        `);
-        res.json(resultado[0]);
+        const { id } = req.params;
+        const [resultado] = await bagulhoDoBanco.query(
+            'DELETE FROM tarefas_producao WHERE id = ?',
+            [id]
+        );
+        if (resultado.affectedRows === 0) {
+            return res.status(404).json({ erro: 'Tarefa não encontrada.' });
+        }
+        res.json({ mensagem: 'Tarefa excluída com sucesso!' });
     } catch (erro) {
-        console.error('erro ao buscar indicadores:', erro);
-        res.status(500).json({ erro: 'deu ruim pra buscar os indicadores' });
+        console.error('--- ERRO AO EXCLUIR TAREFA ---');
+        console.error(erro);
+        res.status(500).json({ erro: 'Erro interno no servidor ao excluir tarefa.' });
     }
 });
 
-app.get('/api/performance-maquina', async (req, res) => {
+
+let numeroTarefaAtual = 1000;
+let quantidadeNoLote = 0;
+let maxPorLote = 5;
+
+async function mudarStatus(id, novoStatus) {
     try {
-        const [linhas] = await bagulhoDoBanco.query(`
-            SELECT 
-                Maquina AS maquina, 
-                SUM(\`Metros Produzidos\`) AS total_metros
-            FROM \`tarefas_producao\`
-            GROUP BY Maquina
-            ORDER BY total_metros DESC;
-        `);
-        res.json(linhas);
-    } catch (erro) {
-        console.error('erro ao buscar performance:', erro);
-        res.status(500).json({ erro: 'deu ruim pra buscar a performance' });
+        await bagulhoDoBanco.query(
+            'UPDATE tarefas_producao SET status = ? WHERE id = ?',
+            [novoStatus, id]
+        );
+        console.log(`Tarefa ${id} agora está "${novoStatus}"`);
+    } catch (err) {
+        console.error(`Erro ao mudar status da tarefa ${id}:`, err);
     }
-});
-
-function numeroAleatorio(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function escolherAleatorio(array) {
-    return array[numeroAleatorio(0, array.length - 1)];
 }
 
 async function criarTarefaAleatoria() {
     try {
         const maquinas = ['Máquina A', 'Máquina B', 'Máquina C'];
-        const tiposTecido = ['meia malha', 'cotton', 'punho pun', 'punho new', 'punho san', 'punho elan'];
-        const tiposSaida = ['rolinho', 'fraldado'];
+        const tiposTecido = [0, 1, 2, 3, 4, 5];
+        const tiposSaida = [0, 1];
+        const tarefaCompletaOpcoes = ['TRUE', 'FALSE'];
+        const sobraOpcoes = ['TRUE', 'FALSE'];
 
-        const maquina = escolherAleatorio(maquinas);
-        const tipoTecido = escolherAleatorio(tiposTecido);
-        const tipoSaida = escolherAleatorio(tiposSaida);
-        const numeroTarefa = numeroAleatorio(1000, 9999);
-        const tempoSetup = numeroAleatorio(60, 600);
-        const tempoProducao = numeroAleatorio(300, 3600);
-        const qtdTiras = numeroAleatorio(10, 200);
-        const metros = numeroAleatorio(50, 1000);
-        const tarefaCompleta = escolherAleatorio(['TRUE', 'FALSE']);
-        const temSobra = escolherAleatorio(['TRUE', 'FALSE']);
-        const observacao = `Observação automática ${Date.now()}`;
+        if (quantidadeNoLote >= maxPorLote) {
+            numeroTarefaAtual += 1;
+            quantidadeNoLote = 0;
+            maxPorLote = Math.floor(Math.random() * 5) + 3;
+            console.log(`Novo lote iniciado: ${numeroTarefaAtual} (${maxPorLote} tarefas esperadas)`);
+        }
 
-        await bagulhoDoBanco.query(
+        const maquina = maquinas[Math.floor(Math.random() * maquinas.length)];
+        const tipoTecido = tiposTecido[Math.floor(Math.random() * tiposTecido.length)];
+        const tipoSaida = tiposSaida[Math.floor(Math.random() * tiposSaida.length)];
+        const tempoSetup = Math.floor(Math.random() * 600) + 60;
+        const tempoProducao = Math.floor(Math.random() * 3600) + 300;
+        const qtdTiras = Math.floor(Math.random() * 200) + 10;
+        const metros = Math.floor(Math.random() * 1000) + 50;
+        const tarefaCompleta = tarefaCompletaOpcoes[Math.floor(Math.random() * tarefaCompletaOpcoes.length)];
+        const temSobra = sobraOpcoes[Math.floor(Math.random() * sobraOpcoes.length)];
+        const observacao = `Gerado automaticamente em ${new Date().toLocaleString('pt-BR')}`;
+
+        const [resultado] = await bagulhoDoBanco.query(
             `INSERT INTO tarefas_producao
-            (\`Data (AAAA-MM-DD HH:MM:SS)\`, Maquina, \`Tipo Tecido\`, \`Tipo de Saida\`, \`Numero da tarefa\`, 
+            (data_registro, Maquina, \`Tipo Tecido\`, \`Tipo de Saida\`, \`Numero da tarefa\`, 
              \`Tempo de setup\`, \`Tempo de Produção\`, \`Quantidade de Tiras\`, \`Metros Produzidos\`, 
-             \`Tarefa completa?\`, \`Sobra de Rolo?\`, \`obs\`)
-            VALUES (NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [maquina, tipoTecido, tipoSaida, numeroTarefa, tempoSetup, tempoProducao, qtdTiras, metros, tarefaCompleta, temSobra, observacao]
+             tarefa_completa, sobra_rolo, obs, status)
+            VALUES (NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pendente')`,
+            [maquina, tipoTecido, tipoSaida, numeroTarefaAtual, tempoSetup, tempoProducao, qtdTiras, metros, tarefaCompleta, temSobra, observacao]
         );
 
-        console.log(`Tarefa aleatória inserida: ${numeroTarefa} (${maquina})`);
+        const idInserido = resultado.insertId;
+        quantidadeNoLote += 1;
+        console.log(`Inserida tarefa #${numeroTarefaAtual} (id ${idInserido}) — ${quantidadeNoLote}/${maxPorLote}`);
+
+        setTimeout(async () => {
+            await mudarStatus(idInserido, 'Em andamento');
+
+            const tempoFinalizacao = Math.floor(Math.random() * 5000) + 10000;
+            setTimeout(async () => {
+                const novoStatus = Math.random() < 0.8 ? 'Concluída' : 'Incompleta';
+                await mudarStatus(idInserido, novoStatus);
+            }, tempoFinalizacao);
+        }, 5000);
+
     } catch (err) {
         console.error('Erro ao criar tarefa aleatória:', err);
     }
 }
 
-setInterval(criarTarefaAleatoria, 10000);
+async function criarReinicioMaquina() {
+    try {
+        const maquinas = ['Máquina A', 'Máquina B', 'Máquina C'];
+        const maquina = maquinas[Math.floor(Math.random() * maquinas.length)];
+
+        await bagulhoDoBanco.query(
+            `INSERT INTO tarefas_producao
+            (data_registro, Maquina, \`Tipo Tecido\`, \`Tipo de Saida\`,
+             \`Numero da tarefa\`, \`Tempo de setup\`, \`Tempo de Produção\`,
+             \`Quantidade de Tiras\`, \`Metros Produzidos\`,
+             tarefa_completa, sobra_rolo, obs, status)
+            VALUES (NOW(), ?, 0, 0, 0, 0, 0, 0, 0, 'FALSE', 'FALSE', 'Máquina reiniciada', 'Reinicio')`,
+            [maquina]
+        );
+
+        console.log("Reinício registrado para:", maquina);
+
+    } catch (err) {
+        console.error("Erro ao registrar reinício:", err);
+    }
+}
+
+function intervaloReinicio() {
+    return (1000 * 60 * (1 + Math.random() * 1));
+}
+
+function loopReinicio() {
+    criarReinicioMaquina();
+    setTimeout(loopReinicio, intervaloReinicio());
+}
+
+setTimeout(loopReinicio, intervaloReinicio());
+
+
+setInterval(criarTarefaAleatoria, 4000);
 
 app.listen(portinha, () => {
     console.log(`servidor rodando na porta ${portinha}, tudo nos conformes`);
 });
-

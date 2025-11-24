@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html lang="pt-BR"> <head>
+<html lang="pt-BR"> 
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Suporte</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="style.css"> 
-    <link rel="shortcut icon" href="/frontend/imagem/logo.webp" type="image/x-icon">
+    <link rel="shortcut icon" href="/frontend/imagem/logo.png" type="image/x-icon">
 
     <script>
         (function() {
@@ -24,42 +25,43 @@
 
     <nav id="sidebar" class="border-end border-secondary">
         <div class="sidebar-header text-center py-4 border-bottom border-secondary">
-            <img src="" id="logo-img" alt="Logo Malwee" style="height: 60px; margin: 20px; left: 20px;">
+            <img src="" id="logo-small" alt="Logo Pequeno" style="height: 40px; width: 40px; margin: 0 auto;"> 
+            <img src="" id="logo-img" alt="Logo Malwee" style="height: 60px; margin: 0 auto;"> 
         </div>
-    
+        
         <ul class="nav flex-column mt-3">
             <li class="nav-item">
                 <a class="nav-link" href="/frontend/visaogeral/index.html" id="nav-visao-geral">
-                    <i class="bi bi-grid"></i> Visão Geral
+                    <i class="bi bi-grid"></i> <span>Visão Geral</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/frontend/detalhes/index.html" id="nav-detalhes">
-                    <i class="bi bi-bar-chart-line"></i> Detalhes
+                    <i class="bi bi-bar-chart-line"></i> <span>Detalhes</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/frontend/analise/index.html" id="nav-analise">
-                    <i class="bi bi-pie-chart-fill"></i> Análise de Custos
+                    <i class="bi bi-pie-chart-fill"></i> <span>Análise de Dados</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link active" href="/frontend/Suporte/index.html" id="nav-simulacao">
-                    <i class="bi bi-life-preserver"></i> Suporte
+                    <i class="bi bi-life-preserver"></i> <span>Suporte</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/frontend/configuracoes/index.html" id="nav-config">
-                    <i class="bi bi-gear-fill"></i> Configurações
+                    <i class="bi bi-gear-fill"></i> <span>Configurações</span>
                 </a>
             </li>
         </ul>
     
-        <div class="mt-auto border-top border-secondary p-3">
-            <a href="#" class="btn btn-outline-danger w-100" id="btn-logout">
-                <i class="bi bi-box-arrow-right me-2"></i> Sair
-            </a>
-        </div>
+        <div class="border-top border-secondary" style="margin-top: auto; padding: 12px;"> 
+          <a href="#" class="btn btn-outline-danger w-100" id="btn-logout">
+              <i class="bi bi-box-arrow-right me-2"></i> <span>Sair</span>
+          </a>
+      </div>
     </nav>
     <main id="main-content" class="container-fluid p-4">
         <section class="content-section">
@@ -89,33 +91,36 @@
             </div>
             <div id="manual-container" class="manual-overlay d-none">
                 <div class="manual-card card text-dark">
-                  <div class="card-body">
-                    <h3 class="mb-3">Manual do Sistema</h3>
-              
-                    <div class="manual-text" style="max-height: 450px; overflow-y: auto;">
-                      <p>Bem-vindo ao Manual do Sistema!</p>
-                      <p>Aqui você encontrará todas as instruções para utilizar o painel, configurar relatórios e interpretar gráficos.</p>
-                      <h5 class="mt-3">1. Acesso ao Sistema</h5>
-                      <p>Para acessar o sistema, entre com seu usuário e senha na tela de login. Caso tenha problemas de acesso, contate o suporte técnico.</p>
-                      <h5 class="mt-3">2. Navegação</h5>
-                      <p>O menu lateral contém as seções principais: Visão Geral, Detalhes, Análise e Configurações.</p>
-                      <p>Você pode alternar entre os temas claro e escuro nas configurações do sistema.</p>
-                      <h5 class="mt-3">3. Gráficos</h5>
-                      <ul>
-                            <li>O sistema possui vários tipos de gráficos.</li>
-                      </ul>
-                      <p>Mais informações serão adicionadas conforme o sistema for atualizado.</p>
+                    <div class="card-body">
+                        <h3 class="mb-3">Manual do Sistema</h3>
+            
+                        <div class="manual-text" style="max-height: 450px; overflow-y: auto;">
+                            <p>Bem-vindo ao Manual do Sistema!</p>
+                            <p>Aqui você encontrará todas as instruções para utilizar o painel, configurar relatórios e interpretar gráficos.</p>
+                            <h5 class="mt-3">1. Acesso ao Sistema</h5>
+                            <p>Para acessar o sistema, entre com seu usuário e senha na tela de login. Caso tenha problemas de acesso, contate o suporte técnico.</p>
+                            <h5 class="mt-3">2. Navegação</h5>
+                            <p>O menu lateral contém as seções principais: Visão Geral, Detalhes, Análise e Configurações.</p>
+                            <p>Você pode alternar entre os temas claro e escuro nas configurações do sistema.</p>
+                            <h5 class="mt-3">3. Gráficos</h5>
+                            <ul>
+                                <li>O sistema possui vários tipos de gráficos.</li>
+                            </ul>
+                            <p>Mais informações serão adicionadas conforme o sistema for atualizado.</p>
+                        </div>
+            
+                        <div class="text-end mt-3">
+                            <button id="fechar-manual" class="btn btn-outline-secondary btn-sm">Fechar</button>
+                        </div>
                     </div>
-              
-                    <div class="text-end mt-3">
-                      <button id="fechar-manual" class="btn btn-outline-secondary btn-sm">Fechar</button>
-                    </div>
-                  </div>
                 </div>
-              </div>
-              
-              
+            </div>
+            
+            
         </section>
+
+        <hr>
+        <h1>Forúm</h1>
     </main>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

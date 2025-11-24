@@ -31,6 +31,12 @@ function atualizarCoresGraficos(theme) {
         productivityChart.options.scales.x.ticks.color = fontColor;
         productivityChart.update('none');
     }
+    if (reinicioChart) {
+        reinicioChart.options.scales.x.ticks.color = fontColor;
+        reinicioChart.options.scales.y.grid.color = gridColor;
+        reinicioChart.options.scales.y.ticks.color = fontColor;
+        reinicioChart.update('none');
+    }
     if (tecidoChart) {
         tecidoChart.options.scales.x.grid.color = gridColor;
         tecidoChart.options.scales.x.ticks.color = fontColor;
@@ -65,6 +71,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initCharts();
 
+    initGraficoReinicio();
+
+    preencherSelectMes();
+
     pegaDados();
 
     setInterval(pegaDados, 5000);
@@ -75,6 +85,9 @@ async function pegaDados() {
         const resposta = await fetch(API_BASE_URL);
         if (!resposta.ok) throw new Error(`Erro ao buscar dados: ${resposta.statusText}`);
         const novasTarefas = await resposta.json();
+
+        const reinicios = novasTarefas.filter(t => t.status === "Reinicio");
+        atualizarReinicios(reinicios);
 
         if (JSON.stringify(novasTarefas) === JSON.stringify(todasAsTarefas)) {
             return;
@@ -89,6 +102,81 @@ async function pegaDados() {
 }
 
 
+function atualizarReinicios(reinicios) {
+    const agora = new Date();
+    const reinicios30dias = reinicios.filter(r => {
+        const data = new Date(r.data);
+        return agora - data <= 1000 * 60 * 60 * 24 * 30; // últimos 30 dias
+    });
+
+    document.getElementById("kpi-reinicios").textContent = reinicios30dias.length;
+}
+
+
+let reinicioChart;
+
+function initGraficoReinicio() {
+    const ctx = document.getElementById('reinicioChart').getContext('2d');
+
+    reinicioChart = new Chart(ctx, {
+        type: 'bar',
+        data: { labels: [], datasets: [{
+            label: "Reinícios",
+            data: [],
+            backgroundColor: '#dc3545'
+        }]},
+        options: {
+            responsive: true,
+            scales: {
+                x: { ticks: { color: Chart.defaults.color }},
+                y: { beginAtZero: true, ticks: {precision: 0, color: Chart.defaults.color} }
+            }
+        }
+    });
+}
+
+async function atualizarGraficoReinicio(mes, ano) {
+    const resp = await fetch(`http://localhost:3000/api/reinicios?mes=${mes}&ano=${ano}`);
+    const dados = await resp.json();
+
+    const dias = {};
+
+    dados.forEach(r => {
+        const dia = new Date(r.data).getDate();
+        dias[dia] = (dias[dia] || 0) + 1;
+    });
+
+    const labels = Object.keys(dias).sort((a,b)=>a-b);
+    const valores = labels.map(l => dias[l]);
+
+    reinicioChart.data.labels = labels;
+    reinicioChart.data.datasets[0].data = valores;
+    reinicioChart.update();
+}
+
+function preencherSelectMes() {
+    const select = document.getElementById("selectMes");
+    const agora = new Date();
+
+    for (let i = 0; i < 12; i++) {
+        const d = new Date(agora.getFullYear(), agora.getMonth() - i, 1);
+        const mes = (d.getMonth() + 1).toString().padStart(2, '0');
+        const ano = d.getFullYear();
+
+        const opt = document.createElement("option");
+        opt.value = `${mes}-${ano}`;
+        opt.textContent = `${mes}/${ano}`;
+        select.appendChild(opt);
+    }
+
+    select.addEventListener("change", () => {
+        const [mes, ano] = select.value.split("-");
+        atualizarGraficoReinicio(mes, ano);
+    });
+
+    const [mesAtual, anoAtual] = select.value.split("-");
+    atualizarGraficoReinicio(mesAtual, anoAtual);
+}
 
 function initCharts() {
     const currentTheme = localStorage.getItem('theme') || 'dark';
@@ -195,8 +283,8 @@ function atualizarKPIs(tarefas) {
     const totalMetros = tarefas.reduce((acc, t) => acc + (t.metros || 0), 0);
     const totalTiras = tarefas.reduce((acc, t) => acc + (t.qtd_tiras || 0), 0);
 
-    const tarefasAtivas = tarefas.filter(t => t.status === 'Em Andamento').length;
-    const tarefasPendentes = tarefas.filter(t => t.status === 'Pendente').length;
+    const tarefasAtivas = tarefas.filter(t => (t.status || '').toLowerCase() === 'em andamento').length;
+    const tarefasPendentes = tarefas.filter(t => (t.status || '').toLowerCase() === 'pendente').length;
 
     document.getElementById('kpi-total-tarefas').textContent = numberFormat.format(tarefas.length);
     document.getElementById('kpi-total-metros').textContent = `${numberFormat.format(totalMetros)} m²`;
@@ -208,9 +296,13 @@ function atualizarKPIs(tarefas) {
 }
 
 function atualizarGraficoStatus(tarefas) {
-    const emAndamento = tarefas.filter(t => t.status === 'Em Andamento').length;
-    const pendentes = tarefas.filter(t => t.status === 'Pendente').length;
-    const tarefasInativas = tarefas.filter(t => t.status !== 'Em Andamento' && t.status !== 'Pendente');
+    const emAndamento = tarefas.filter(t => (t.status || '').toLowerCase() === 'em andamento').length;
+    const pendentes = tarefas.filter(t => (t.status || '').toLowerCase() === 'pendente').length;
+    const tarefasInativas = tarefas.filter(t => {
+        const s = (t.status || '').toLowerCase();
+        return s !== 'em andamento' && s !== 'pendente';
+    });
+
     const completas = tarefasInativas.filter(t => t.completa === true).length;
     const incompletas = tarefasInativas.filter(t => t.completa === false).length;
 
