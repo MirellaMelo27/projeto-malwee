@@ -73,9 +73,9 @@ async function enviarComentario() {
 async function carregarComentarios() {
   try {
     const res = await fetch(`${API_ROOT}/api/comentarios`);
-    // Se o backend estiver retornando HTML de erro, aqui vai quebrar — então checamos
+    
     const text = await res.text();
-    // se não for JSON válido, res.json() iria lançar SyntaxError; aqui tratamos isso
+   
     try {
       const comentarios = JSON.parse(text);
       renderizarComentarios(comentarios);

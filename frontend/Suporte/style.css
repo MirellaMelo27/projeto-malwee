@@ -274,3 +274,37 @@ html[data-bs-theme="light"] #sidebar .nav-link:hover {
       margin-left: 0;
   }
 }
+
+html[data-bs-theme="light"] .bg-black {
+  background-color: #ffffff !important;   
+  color: #212529 !important;             
+}
+
+html[data-bs-theme="light"] .bg-dark {
+  background-color: #ffffff !important;
+  color: #212529 !important;
+}
+
+
+html[data-bs-theme="light"] textarea.bg-dark,
+html[data-bs-theme="light"] .form-control.bg-dark {
+  background-color: #ffffff !important;
+  color: #212529 !important;
+  border-color: #dee2e6 !important;
+}
+
+html[data-bs-theme="light"] .list-group-item.bg-black {
+  background-color: #ffffff !important;
+  color: #212529 !important;
+  border-color: #dee2e6 !important;
+}
+
+
+html[data-bs-theme="light"] .text-white {
+  color: #212529 !important;
+}
+html[data-bs-theme="light"] .text-secondary {
+  color: #6c757d !important;
+}
+
+
