@@ -94,7 +94,7 @@ app.get('/api/reinicios', async (req, res) => {
 
         let query = `
             SELECT id, data_registro AS data, Maquina, obs
-            FROM historicoatividades
+            FROM tarefas_producao
             WHERE status = 'Reinicio'
         `;
 
