@@ -157,36 +157,47 @@ function initGraficoReinicio() {
 }
 
 async function atualizarGraficoReinicio(mes, ano) {
-    const resp = await fetch(`http://localhost:3000/api/reinicios?mes=${mes}&ano=${ano}`);
-    const dados = await resp.json();
+    try {
+        const resp = await fetch(`http://localhost:3000/api/reinicios?mes=${mes}&ano=${ano}`);
+        
+        if (!resp.ok) {
+            console.error('Erro no servidor:', await resp.text());
+            return; 
+        }
 
-    const ocorrenciasPorDia = {};
+        const dados = await resp.json();
 
-    dados.forEach(r => {
-        const dataObj = new Date(r.data);
-        const dia = dataObj.getDate(); 
-        ocorrenciasPorDia[dia] = (ocorrenciasPorDia[dia] || 0) + 1;
-    });
+        const listaSegura = Array.isArray(dados) ? dados : [];
 
-    
-    const qtdDiasNoMes = new Date(ano, mes, 0).getDate();
-    
-    const labels = [];
-    const valores = [];
+        const ocorrenciasPorDia = {};
 
-    for (let i = 1; i <= qtdDiasNoMes; i++) {
-        labels.push(i);
-        valores.push(ocorrenciasPorDia[i] || 0);
+        listaSegura.forEach(r => {
+            const dataObj = new Date(r.data);
+            const dia = dataObj.getDate(); 
+            ocorrenciasPorDia[dia] = (ocorrenciasPorDia[dia] || 0) + 1;
+        });
+
+        const qtdDiasNoMes = new Date(ano, mes, 0).getDate();
+        const labels = [];
+        const valores = [];
+
+        for (let i = 1; i <= qtdDiasNoMes; i++) {
+            labels.push(i);
+            valores.push(ocorrenciasPorDia[i] || 0);
+        }
+
+        reinicioChart.data.labels = labels;
+        reinicioChart.data.datasets[0].data = valores;
+        
+        const totalMes = valores.reduce((a, b) => a + b, 0);
+        const kpiReinicios = document.getElementById("kpi-reinicios");
+        if(kpiReinicios) kpiReinicios.textContent = totalMes;
+
+        reinicioChart.update();
+
+    } catch (erro) {
+        console.error("Falha ao atualizar gráfico:", erro);
     }
-
-    reinicioChart.data.labels = labels;
-    reinicioChart.data.datasets[0].data = valores;
-    
-    const totalMes = valores.reduce((a, b) => a + b, 0);
-    const kpiReinicios = document.getElementById("kpi-reinicios");
-    if(kpiReinicios) kpiReinicios.textContent = totalMes;
-
-    reinicioChart.update();
 }
 
 function preencherSelectMes() {
