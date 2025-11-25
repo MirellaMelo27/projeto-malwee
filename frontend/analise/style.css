@@ -396,6 +396,19 @@ html[data-bs-theme="light"] #sidebar {
     border-right: 1px solid #dee2e6 !important;
 }
 
+[data-bs-theme="light"] .card,
+[data-bs-theme="light"] .card2,
+[data-bs-theme="light"] .card3,
+[data-bs-theme="light"] .card-grafico {
+    color: #212529 !important; /* Torna o texto escuro */
+    border-color: #dee2e6 !important; /* Ajusta a borda para cinza claro */
+}
+
+[data-bs-theme="light"] .card h4,
+[data-bs-theme="light"] .card h6 {
+    color: #212529 !important;
+}
+
 html[data-bs-theme="light"] #sidebar .nav-link {
     color: #212529 !important;
 }

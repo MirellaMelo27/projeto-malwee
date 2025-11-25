@@ -99,4 +99,4 @@ document.querySelector('#loginCard button').addEventListener('click', async () =
 });
 
 // a gente implementou algumas lógicas aqui. por mais que não haja segurança real (nao da pra usar isso sem rever, mas ok) voce so pode registrar
-// se usar algum email com o dominio da malwee. tbm tem a estrutura pra salvar teu nome na hora de mostrar o dashboard, e exibir "Olá, Pessoa"
+// se usar algum email com o dominio da malwee. tbm tem a estrutura pra salvar teu nome na hora de mostrar o dashboard, e exibir "Olá, Pessoa" -maik
