@@ -11,10 +11,10 @@ app.use(express.static('frontend'));
 
 const bagulhoDoBanco = mysql.createPool({
     host: 'localhost',
-    port: 3307,
+    port: 3306,
     user: 'root',
-    password: 'root',
-    database: 'projeto_malwee',
+    password: '',
+    database: 'planilha',
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
@@ -364,6 +364,44 @@ setTimeout(loopReinicio, intervaloReinicio());
 
 
 setInterval(criarTarefaAleatoria, 4000);
+
+// LISTAR comentários
+app.get('/api/comentarios', async (req, res) => {
+    try {
+      const [rows] = await bagulhoDoBanco.query(
+        `SELECT id_comentario, email_usuario, descricao,
+                DATE_FORMAT(data_comentario, '%Y-%m-%d %H:%i:%s') AS data_comentario
+         FROM comentario
+         ORDER BY id_comentario DESC
+         LIMIT 500`
+      );
+      res.json(rows);
+    } catch (err) {
+      console.error('Erro ao buscar comentários:', err);
+      res.status(500).json({ erro: 'Erro interno ao buscar comentários.' });
+    }
+  });
+  
+  // INSERIR comentário
+  app.post('/api/comentarios', async (req, res) => {
+    try {
+      const { email_usuario, descricao } = req.body;
+      if (!descricao || !email_usuario) {
+        return res.status(400).json({ erro: 'Campos obrigatórios faltando.' });
+      }
+  
+      const [resultado] = await bagulhoDoBanco.query(
+        'INSERT INTO comentario (email_usuario, descricao, data_comentario) VALUES (?, ?, NOW())',
+        [email_usuario, descricao]
+      );
+  
+      res.status(201).json({ id_comentario: resultado.insertId });
+    } catch (err) {
+      console.error('Erro ao inserir comentário:', err);
+      res.status(500).json({ erro: 'Erro interno ao inserir comentário.' });
+    }
+  });
+  
 
 app.listen(portinha, () => {
     console.log(`servidor rodando na porta ${portinha}, tudo nos conformes`);
