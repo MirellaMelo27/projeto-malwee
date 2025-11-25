@@ -123,13 +123,34 @@ function initGraficoReinicio() {
         data: { labels: [], datasets: [{
             label: "Reinícios",
             data: [],
-            backgroundColor: '#dc3545'
+            backgroundColor: '#dc3545',
+            maxBarThickness: 50 
         }]},
         options: {
             responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { 
+                    display: false 
+                },
+                tooltip: {
+                    callbacks: {
+                        title: function(context) {
+                            return `Dia ${context[0].label}`;
+                        }
+                    }
+                }
+            },
             scales: {
-                x: { ticks: { color: Chart.defaults.color }},
-                y: { beginAtZero: true, ticks: {precision: 0, color: Chart.defaults.color} }
+                x: { 
+                    ticks: { color: Chart.defaults.color },
+                    grid: { display: false }
+                },
+                y: { 
+                    beginAtZero: true, 
+                    ticks: { precision: 0, stepSize: 1, color: Chart.defaults.color },
+                    grid: { color: Chart.defaults.borderColor }
+                }
             }
         }
     });
@@ -139,18 +160,32 @@ async function atualizarGraficoReinicio(mes, ano) {
     const resp = await fetch(`http://localhost:3000/api/reinicios?mes=${mes}&ano=${ano}`);
     const dados = await resp.json();
 
-    const dias = {};
+    const ocorrenciasPorDia = {};
 
     dados.forEach(r => {
-        const dia = new Date(r.data).getDate();
-        dias[dia] = (dias[dia] || 0) + 1;
+        const dataObj = new Date(r.data);
+        const dia = dataObj.getDate(); 
+        ocorrenciasPorDia[dia] = (ocorrenciasPorDia[dia] || 0) + 1;
     });
 
-    const labels = Object.keys(dias).sort((a,b)=>a-b);
-    const valores = labels.map(l => dias[l]);
+    
+    const qtdDiasNoMes = new Date(ano, mes, 0).getDate();
+    
+    const labels = [];
+    const valores = [];
+
+    for (let i = 1; i <= qtdDiasNoMes; i++) {
+        labels.push(i);
+        valores.push(ocorrenciasPorDia[i] || 0);
+    }
 
     reinicioChart.data.labels = labels;
     reinicioChart.data.datasets[0].data = valores;
+    
+    const totalMes = valores.reduce((a, b) => a + b, 0);
+    const kpiReinicios = document.getElementById("kpi-reinicios");
+    if(kpiReinicios) kpiReinicios.textContent = totalMes;
+
     reinicioChart.update();
 }
 
