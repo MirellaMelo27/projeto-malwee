@@ -15,7 +15,6 @@ const mapStatus = ['Pendente', 'Em andamento', 'Concluída', 'Incompleta'];
 const mapTipoTecidoParaValor = Object.fromEntries(Object.entries(mapTipoTecido).map(([key, value]) => [value, key]));
 const mapTipoSaidaParaValor = Object.fromEntries(Object.entries(mapTipoSaida).map(([key, value]) => [value, key]));
 
-// Elementos do DOM
 let tabelaCorpo, totalSpan, paginacaoInfo, paginacaoNav, inputBusca, inputBuscaData, 
     botaoBuscar, loadingSpinner, tabelaContainer, paginacaoContainer,
     taskFormModal, taskForm, taskFormLabel, taskIdInput, formErrorMessage,
@@ -66,11 +65,10 @@ async function pegaDados() {
     if (data) params.append('dataBusca', data);
     url += params.toString();
 
-    // Usa classes do Bootstrap para mostrar spinner e esconder conteúdo
     loadingSpinner.classList.remove('d-none');
-    loadingSpinner.classList.add('d-flex'); // Usa d-flex para centralizar
-    tabelaContainer.classList.add('d-none'); // Esconde a tabela
-    paginacaoContainer.classList.add('d-none'); // Esconde a paginação
+    loadingSpinner.classList.add('d-flex'); 
+    tabelaContainer.classList.add('d-none'); 
+    paginacaoContainer.classList.add('d-none');
     paginacaoContainer.classList.remove('d-flex');
 
     try {
